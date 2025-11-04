@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="220" height="40" viewBox="0 0 220 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="aaGrad" x1="0" y1="0" x2="220" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#EF4444"/>
+    </linearGradient>
+  </defs>
+  <!-- Emblem: Crosshair + A monogram -->
+  <g transform="translate(4,4)">
+    <!-- Crosshair circle -->
+    <circle cx="14" cy="16" r="10" stroke="url(#aaGrad)" stroke-width="3" fill="none"/>
+    <!-- Crosshair lines -->
+    <path d="M14 3 v6 M14 23 v6 M1 16 h6 M21 16 h6" stroke="url(#aaGrad)" stroke-width="2" stroke-linecap="round"/>
+    <!-- Stylized A -->
+    <path d="M34 26 L41 6 L48 26 M37 20 h6" stroke="url(#aaGrad)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Wordmark: AIMARCADE -->
+  <g transform="translate(66,6)">
+    <text x="0" y="22" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="800" letter-spacing="1" fill="#ffffff">AIM</text>
+    <text x="46" y="22" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="800" letter-spacing="1" fill="url(#aaGrad)">ARCADE</text>
+  </g>
+</svg>
