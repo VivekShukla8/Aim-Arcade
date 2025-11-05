@@ -46,6 +46,14 @@ export default function TournamentDetail(){
             <span className="text-zinc-400">Max Teams</span>
             <span className="text-white font-medium">{t.maxTeams}</span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-zinc-400">Date</span>
+            <span className="text-white font-medium">{t.date ? new Date(t.date).toLocaleDateString() : '-'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-zinc-400">Time</span>
+            <span className="text-white font-medium">{t.time || '-'}</span>
+          </div>
 
           {/* Room Credentials */}
           {canSeeRoom && (t.roomId || t.roomPassword) && (
@@ -81,13 +89,22 @@ export default function TournamentDetail(){
           )}
         </div>
 
+        {/* Completed Notice */}
+        {t.status === 'completed' && (
+          <div className="text-sm p-3 rounded-lg bg-red-600/10 border border-red-500/30 text-red-400">
+            Registration is closed for this tournament.
+          </div>
+        )}
+
         {/* Register Button */}
-        <Link 
-          to={`/register/${t._id}`} 
-          className="inline-block text-center bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 rounded-lg px-5 py-2.5 text-sm font-medium transition-all cursor-pointer"
-        >
-          Register Team
-        </Link>
+        {t.status !== 'completed' && (
+          <Link 
+            to={`/register/${t._id}`} 
+            className="inline-block text-center bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 rounded-lg px-5 py-2.5 text-sm font-medium transition-all cursor-pointer"
+          >
+            Register Team
+          </Link>
+        )}
       </div>
     </div>
   );

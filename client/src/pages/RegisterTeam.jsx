@@ -43,6 +43,17 @@ export default function RegisterTeam(){
     </div>
   );
 
+  if (t.status === 'completed') return (
+    <div className="min-h-screen">
+      <TopNav />
+      <div className="p-4 space-y-4 max-w-5xl mx-auto">
+        <div className="text-sm p-3 rounded-lg bg-red-600/10 border border-red-500/30 text-red-400">
+          Registration is closed for this tournament.
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen">
       <TopNav />
