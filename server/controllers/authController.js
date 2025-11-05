@@ -8,9 +8,12 @@ export const googleAuthSuccess = (req, res) => {
 
   const token = generateToken(req.user._id, req.user.role);
 
+  const isProd = process.env.NODE_ENV === "production";
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+    path: "/",
   });
 
   const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
