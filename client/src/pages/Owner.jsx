@@ -30,7 +30,7 @@ export default function Owner(){
     return `${h}:${min}`;
   };
   const [form,setForm]=useState({ name:'', mode:'classic', type:'solo', entryFee:50, map:'Erangel', date:toDate(), time:toTime(), maxTeams:16, status:'upcoming' });
-  const [selMode,setSelMode]=useState('br'); // br, cs, lw
+  const [selMode,setSelMode]=useState('br');
   const [msg,setMsg]=useState('');
   const [list,setList]=useState([]);
   const [editId,setEditId]=useState('');
@@ -47,7 +47,6 @@ export default function Owner(){
   const load = async ()=>{ 
     const data = await apiFetch('/api/tournaments'); 
     setList(data);
-    // background sync: patch status if out-of-date
     const mismatches = data.filter(t => (t.status||'upcoming') !== computeStatus(t.date, t.time));
     if (mismatches.length){
       await Promise.allSettled(mismatches.map(t=> apiFetch(`/api/tournaments/${t._id}`, { method:'PATCH', body:{ status: computeStatus(t.date, t.time) } })));
@@ -98,114 +97,302 @@ export default function Owner(){
     }catch{ setMsg('Update failed'); }
   };
   const cancelEdit = ()=>{ setEditId(''); };
+  
   return (
     <div className="min-h-screen">
       <TopNav />
-      <div className="p-4 grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-        {msg && <div className="text-xs text-zinc-300">{msg}</div>}
-        <form onSubmit={create} className="space-y-3 text-sm order-3 md:order-1">
-          <div className="rounded bg-zinc-900/70 border border-zinc-800 p-3">
-            <div className="text-xs text-zinc-400 mb-2">Select a mode</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <button type="button" onClick={()=>onPickMode('br')} className={`group rounded overflow-hidden border ${selMode==='br'?'border-indigo-500 ring-2 ring-indigo-500':'border-zinc-800'}`}>
-                <div className="aspect-[16/9] bg-black flex items-center justify-center">
-                  <img src={battleRoyalImg} alt="Battle Royale" className="w-full h-full object-contain" />
-                </div>
-                <div className="px-2 py-2 text-left">
-                  <div className="text-[11px] tracking-wide text-zinc-300">BATTLE ROYALE</div>
-                  <div className="text-[10px] text-zinc-500">Solo / Duo / Squad</div>
-                </div>
-              </button>
-              <button type="button" onClick={()=>onPickMode('cs')} className={`group rounded overflow-hidden border ${selMode==='cs'?'border-indigo-500 ring-2 ring-indigo-500':'border-zinc-800'}`}>
-                <div className="aspect-[16/9] bg-black flex items-center justify-center">
-                  <img src={clashSquadImg} alt="Clash Squad" className="w-full h-full object-contain" />
-                </div>
-                <div className="px-2 py-2 text-left">
-                  <div className="text-[11px] tracking-wide text-zinc-300">CLASH SQUAD</div>
-                  <div className="text-[10px] text-zinc-500">4v4 Round-based</div>
-                </div>
-              </button>
-              <button type="button" onClick={()=>onPickMode('lw')} className={`group rounded overflow-hidden border ${selMode==='lw'?'border-indigo-500 ring-2 ring-indigo-500':'border-zinc-800'}`}>
-                <div className="aspect-[16/9] bg-black flex items-center justify-center">
-                  <img src={loneWolfImg} alt="Lone Wolf" className="w-full h-full object-contain" />
-                </div>
-                <div className="px-2 py-2 text-left">
-                  <div className="text-[11px] tracking-wide text-zinc-300">LONE WOLF</div>
-                  <div className="text-[10px] text-zinc-500">1v1 Duels</div>
-                </div>
-              </button>
-            </div>
+      <div className="px-4 py-6 max-w-7xl mx-auto">
+        {msg && (
+          <div className="mb-4 px-4 py-2 bg-emerald-900/30 border border-emerald-700/50 rounded-lg text-sm text-emerald-300 max-w-md">
+            {msg}
           </div>
-          <input className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
-          <input className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Map" value={form.map} onChange={e=>setForm({...form,map:e.target.value})} />
-          <div className="grid grid-cols-2 gap-2">
-            <input type="date" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
-            <input type="time" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={form.time} onChange={e=>setForm({...form,time:e.target.value})} />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <select className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={form.mode} onChange={e=>setForm({...form,mode:e.target.value})}>
-              <option value="classic">classic (Battle Royale/Lone Wolf)</option>
-              <option value="clash_squad">clash_squad</option>
-            </select>
-            <select className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={form.type} onChange={e=>setForm({...form,type:e.target.value})}>
-              <option value="solo">solo</option>
-              <option value="duo">duo</option>
-              <option value="squad">squad</option>
-            </select>
-            <input type="number" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Entry Fee" value={form.entryFee} onChange={e=>setForm({...form,entryFee:e.target.value})} />
-            <input type="number" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Max Teams (max 25)" value={form.maxTeams} onChange={e=>setForm({...form,maxTeams:e.target.value})} />
-          </div>
-          <button className="w-full bg-indigo-600 rounded py-3 text-sm font-medium">Create</button>
-        </form>
-        {editId && (
-          <form onSubmit={saveEdit} className="space-y-3 text-sm order-2 md:order-2 bg-zinc-900/70 border border-zinc-800 rounded p-3">
-            <div className="text-sm font-semibold">Edit Tournament</div>
-            <input className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Name" value={edit.name} onChange={e=>setEdit({...edit,name:e.target.value})} />
-            <input className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Map" value={edit.map} onChange={e=>setEdit({...edit,map:e.target.value})} />
-            <div className="grid grid-cols-2 gap-2">
-              <input type="date" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={edit.date} onChange={e=>setEdit({...edit,date:e.target.value})} />
-              <input type="time" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={edit.time} onChange={e=>setEdit({...edit,time:e.target.value})} />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <select className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={edit.mode} onChange={e=>setEdit({...edit,mode:e.target.value})}>
-                <option value="classic">classic</option>
-                <option value="clash_squad">clash_squad</option>
-              </select>
-              <select className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" value={edit.type} onChange={e=>setEdit({...edit,type:e.target.value})}>
-                <option value="solo">solo</option>
-                <option value="duo">duo</option>
-                <option value="squad">squad</option>
-              </select>
-              <input type="number" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Entry Fee" value={edit.entryFee} onChange={e=>setEdit({...edit,entryFee:e.target.value})} />
-              <input type="number" className="bg-zinc-900 border border-zinc-800 rounded px-3 py-3 text-sm" placeholder="Max Teams (max 25)" value={edit.maxTeams} onChange={e=>setEdit({...edit,maxTeams:e.target.value})} />
-            </div>
-            <div className="flex gap-2">
-              <button type="submit" className="flex-1 bg-green-600 rounded py-2 text-sm">Save</button>
-              <button type="button" onClick={cancelEdit} className="flex-1 bg-zinc-800 border border-zinc-700 rounded py-2 text-sm">Cancel</button>
-            </div>
-          </form>
         )}
-        <div className="space-y-3 order-1 md:order-3">
-          <div className="text-sm font-semibold">All Tournaments</div>
-          <div className="space-y-2">
-            {list.map(t=> (
-              <div key={t._id} className="rounded bg-zinc-900/80 border border-zinc-800 p-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{t.name}</div>
-                    <div className="text-xs text-zinc-400">{t.mode} · {t.type} · ₹{t.entryFee}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded border ${t.status==='completed'?'border-zinc-700 text-zinc-400':'border-zinc-700 text-zinc-500'}`}>{t.status}</span>
-                    <Link to={`/owner/t/${t._id}/participants`} className="text-xs text-indigo-400">Participants →</Link>
-                    <button onClick={()=>startEdit(t)} className="text-xs px-2 py-1 rounded bg-zinc-800 border border-zinc-700">Edit</button>
-                    {t.status==='completed' && (
-                      <button onClick={()=>deleteTournament(t._id)} className="text-xs px-2 py-1 rounded bg-red-600">Delete</button>
-                    )}
+        
+        <div className="grid lg:grid-cols-12 gap-6">
+          {/* Left Column - Create Tournament */}
+          <div className="lg:col-span-5">
+            <div className="sticky top-6">
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">Create Tournament</h2>
+              <form onSubmit={create} className="space-y-4 text-sm">
+                <div className="rounded-lg bg-zinc-900/70 border border-zinc-800 p-4">
+                  <div className="text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wide">Select Mode</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button 
+                      type="button" 
+                      onClick={()=>onPickMode('br')} 
+                      className={`rounded-lg overflow-hidden border-2 transition-all ${selMode==='br'?'border-indigo-500 shadow-lg shadow-indigo-500/20':'border-zinc-800 hover:border-zinc-700'}`}
+                    >
+                      <div className="aspect-[4/3] bg-black flex items-center justify-center">
+                        <img src={battleRoyalImg} alt="Battle Royale" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="px-2 py-1.5 bg-zinc-900/50">
+                        <div className="text-[10px] font-medium tracking-wide text-zinc-300">BR</div>
+                      </div>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={()=>onPickMode('cs')} 
+                      className={`rounded-lg overflow-hidden border-2 transition-all ${selMode==='cs'?'border-indigo-500 shadow-lg shadow-indigo-500/20':'border-zinc-800 hover:border-zinc-700'}`}
+                    >
+                      <div className="aspect-[4/3] bg-black flex items-center justify-center">
+                        <img src={clashSquadImg} alt="Clash Squad" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="px-2 py-1.5 bg-zinc-900/50">
+                        <div className="text-[10px] font-medium tracking-wide text-zinc-300">CS</div>
+                      </div>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={()=>onPickMode('lw')} 
+                      className={`rounded-lg overflow-hidden border-2 transition-all ${selMode==='lw'?'border-indigo-500 shadow-lg shadow-indigo-500/20':'border-zinc-800 hover:border-zinc-700'}`}
+                    >
+                      <div className="aspect-[4/3] bg-black flex items-center justify-center">
+                        <img src={loneWolfImg} alt="Lone Wolf" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="px-2 py-1.5 bg-zinc-900/50">
+                        <div className="text-[10px] font-medium tracking-wide text-zinc-300">LW</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
+
+                <input 
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                  placeholder="Tournament Name" 
+                  value={form.name} 
+                  onChange={e=>setForm({...form,name:e.target.value})} 
+                />
+                
+                <input 
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                  placeholder="Map Name" 
+                  value={form.map} 
+                  onChange={e=>setForm({...form,map:e.target.value})} 
+                />
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Date</label>
+                    <input 
+                      type="date" 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      value={form.date} 
+                      onChange={e=>setForm({...form,date:e.target.value})} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Time</label>
+                    <input 
+                      type="time" 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      value={form.time} 
+                      onChange={e=>setForm({...form,time:e.target.value})} 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Mode</label>
+                    <select 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      value={form.mode} 
+                      onChange={e=>setForm({...form,mode:e.target.value})}
+                    >
+                      <option value="classic">Classic</option>
+                      <option value="clash_squad">Clash Squad</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Type</label>
+                    <select 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      value={form.type} 
+                      onChange={e=>setForm({...form,type:e.target.value})}
+                    >
+                      <option value="solo">Solo</option>
+                      <option value="duo">Duo</option>
+                      <option value="squad">Squad</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Entry Fee (₹)</label>
+                    <input 
+                      type="number" 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      placeholder="50" 
+                      value={form.entryFee} 
+                      onChange={e=>setForm({...form,entryFee:e.target.value})} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-500 mb-1.5">Max Teams</label>
+                    <input 
+                      type="number" 
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none transition-colors" 
+                      placeholder="16" 
+                      value={form.maxTeams} 
+                      onChange={e=>setForm({...form,maxTeams:e.target.value})} 
+                    />
+                  </div>
+                </div>
+
+                <button className="w-full bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-lg py-2.5 text-sm font-medium">
+                  Create Tournament
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Column - Tournament List & Edit */}
+          <div className="lg:col-span-7 space-y-6">
+            {editId && (
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Edit Tournament</h2>
+                <form onSubmit={saveEdit} className="space-y-4 text-sm bg-zinc-900/70 border border-zinc-800 rounded-lg p-4">
+                  <input 
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                    placeholder="Tournament Name" 
+                    value={edit.name} 
+                    onChange={e=>setEdit({...edit,name:e.target.value})} 
+                  />
+                  
+                  <input 
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                    placeholder="Map Name" 
+                    value={edit.map} 
+                    onChange={e=>setEdit({...edit,map:e.target.value})} 
+                  />
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Date</label>
+                      <input 
+                        type="date" 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.date} 
+                        onChange={e=>setEdit({...edit,date:e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Time</label>
+                      <input 
+                        type="time" 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.time} 
+                        onChange={e=>setEdit({...edit,time:e.target.value})} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Mode</label>
+                      <select 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.mode} 
+                        onChange={e=>setEdit({...edit,mode:e.target.value})}
+                      >
+                        <option value="classic">Classic</option>
+                        <option value="clash_squad">Clash Squad</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Type</label>
+                      <select 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.type} 
+                        onChange={e=>setEdit({...edit,type:e.target.value})}
+                      >
+                        <option value="solo">Solo</option>
+                        <option value="duo">Duo</option>
+                        <option value="squad">Squad</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Entry Fee (₹)</label>
+                      <input 
+                        type="number" 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.entryFee} 
+                        onChange={e=>setEdit({...edit,entryFee:e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-zinc-500 mb-1.5">Max Teams</label>
+                      <input 
+                        type="number" 
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none transition-colors" 
+                        value={edit.maxTeams} 
+                        onChange={e=>setEdit({...edit,maxTeams:e.target.value})} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-500 transition-colors rounded-lg py-2.5 text-sm font-medium">
+                      Save Changes
+                    </button>
+                    <button type="button" onClick={cancelEdit} className="flex-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors rounded-lg py-2.5 text-sm font-medium">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-            ))}
+            )}
+
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-100 mb-4">All Tournaments</h2>
+              <div className="space-y-3">
+                {list.map(t=> (
+                  <div key={t._id} className="rounded-lg bg-zinc-900/80 border border-zinc-800 p-4 hover:border-zinc-700 transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-zinc-100 mb-1">{t.name}</div>
+                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                          <span className="px-2 py-0.5 bg-zinc-800 rounded">{t.mode}</span>
+                          <span className="px-2 py-0.5 bg-zinc-800 rounded">{t.type}</span>
+                          <span className="px-2 py-0.5 bg-zinc-800 rounded">₹{t.entryFee}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`text-[10px] px-2 py-1 rounded-md font-medium uppercase tracking-wide ${t.status==='completed'?'bg-zinc-800 text-zinc-400 border border-zinc-700':'bg-blue-900/30 text-blue-300 border border-blue-700/50'}`}>
+                          {t.status}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Link 
+                            to={`/owner/t/${t._id}/participants`} 
+                            className="text-xs px-3 py-1.5 rounded-md bg-indigo-900/30 text-indigo-300 border border-indigo-700/50 hover:bg-indigo-900/50 transition-colors"
+                          >
+                            View
+                          </Link>
+                          <button 
+                            onClick={()=>startEdit(t)} 
+                            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          {t.status==='completed' && (
+                            <button 
+                              onClick={()=>deleteTournament(t._id)} 
+                              className="text-xs px-3 py-1.5 rounded-md bg-orange-900/30 text-orange-300 border border-orange-700/50 hover:bg-orange-900/50 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -2,53 +2,129 @@
 
 /* Extreme dark base */
 html, body, #root { height: 100%; }
-body { background: #000; color: #e5e7eb; }
+body { 
+  background: #000; 
+  color: #e5e7eb;
+}
 
-/* Global full-page background using provided assets */
+/* Global full-page background using esports/gaming images from Unsplash */
 body::before{
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: url('/src/assets/undefined.jpg');
+  /* Mobile: Gaming setup background */
+  background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80');
   background-size: cover;
   background-position: center; 
   /* Subtle blur and darkening across the whole page background */
-  filter: blur(2px) brightness(0.7);
+  filter: blur(2px) brightness(0.4);
   transform: scale(1.03); /* prevent edge transparency from blur */
 }
 @media (min-width: 768px){
-  body::before{ background-image: url('/src/assets/Screenshot 2025-11-03 150333.png'); }
+  body::before{ 
+    /* Desktop: Esports arena/tournament background */
+    background-image: url('./assets/pcBackground.jpeg'); 
+  }
 }
-/* subtle glow overlay */
+
+/* Gradient overlay for depth with gaming colors */
 body::after{
   content: '';
-  position: fixed; inset:0; z-index:-1;
-  /* Remove bottom dark band; keep only a very subtle glow */
-  background: radial-gradient(60% 40% at 50% 20%, rgba(255,255,255,0.05), transparent 60%);
+  position: fixed; 
+  inset:0; 
+  z-index:-1;
+  background: radial-gradient(ellipse 60% 40% at 50% 20%, rgba(251, 146, 60, 0.12), transparent 60%),
+              radial-gradient(ellipse 50% 50% at 20% 80%, rgba(168, 85, 247, 0.08), transparent 60%),
+              linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
   pointer-events: none;
 }
 
-/* Hero background utilities (mobile: undefined.jpg, desktop: Screenshot ... .png) */
+/* Hero background utilities - gaming themed */
 .bg-hero {
-  background-image: url('/src/assets/undefined.jpg');
+  /* Mobile: Colorful gaming setup */
+  background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80');
   background-size: cover;
   background-position: center;
+  position: relative;
 }
 @media (min-width: 768px) {
-  .bg-hero { background-image: url('/src/assets/Screenshot 2025-11-03 150333.png'); }
-}
-.bg-hero::after {
-  content: '';
-  position: absolute; inset: 0; backdrop-filter: none;
+  .bg-hero { 
+    /* Desktop: Epic esports arena */
+    background-image: url('./assets/pcBackground.jpeg'); 
+  }
 }
 
-/* Auth two-column layout helpers */
+/* Auth two-column layout helpers - gaming themed */
 .auth-left {
-  background-image: url('/src/assets/Screenshot 2025-11-03 150333.png');
+  /* Gaming keyboard and mouse close-up */
+  background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80');
   background-size: cover;
   background-position: center;
 }
 @media (max-width: 767px){
-  .auth-left { background-image: url('/src/assets/undefined.jpg'); }
+  .auth-left { 
+    /* Mobile: Neon gaming setup */
+    background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80'); 
+  }
 }
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for webkit browsers - gaming themed */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f97316, #dc2626);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ea580c, #b91c1c);
+}
+
+/* Animation keyframes */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Ensure proper text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Additional gaming-themed particle effect overlay */
+body::after {
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.1), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.1), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(251, 146, 60, 0.2), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(251, 146, 60, 0.2), transparent),
+    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+  background-size: 200% 200%, 200% 200%, 300% 300%, 300% 300%, 100% 100%;
+  animation: particles 20s ease-in-out infinite;
+}
+
+@keyframes particles {
+  0%, 100% {
+    background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 0% 0%;
+  }
+} 
