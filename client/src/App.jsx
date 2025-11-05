@@ -16,6 +16,7 @@ import RegisterTeamPage from './pages/RegisterTeam.jsx';
 import JoinTeamPage from './pages/JoinTeam.jsx';
 import MyRegsPage from './pages/MyRegs.jsx';
 import TeamDetailsPage from './pages/TeamDetails.jsx';
+import ProfilePage from './pages/Profile.jsx';
 
 export default function App(){
   return (
@@ -37,6 +38,7 @@ export default function App(){
         <Route path="/owner" element={<OwnerPage/>} />
         <Route path="/user" element={<LoginPage/>} />
         <Route path="/login" element={<LoginPage/>} />
+        <Route path="/profile" element={<ProfilePage/>} />
       </Routes>
     </BrowserRouter>
   );

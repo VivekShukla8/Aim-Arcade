@@ -19,7 +19,7 @@ export default function HeaderBar({ title }){
             {me ? (
               <>
                 <div className="px-3 py-2 text-zinc-400">{me.name || me.email}</div>
-                <Link to="/user" className="block px-3 py-2 hover:bg-zinc-800">Profile</Link>
+                <Link to="/profile" className="block px-3 py-2 hover:bg-zinc-800">Profile</Link>
                 <button onClick={()=>{clearToken(); setOpen(false);}} className="w-full text-left px-3 py-2 hover:bg-zinc-800">Logout</button>
               </>
             ) : (
