@@ -2,7 +2,8 @@ import { generateToken } from "../utils/generateToken.js";
 
 export const googleAuthSuccess = (req, res) => {
   if (!req.user) {
-    return res.redirect("http://localhost:5173/login?error=auth_failed");
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    return res.redirect(`${clientUrl}/login?error=auth_failed`);
   }
 
   const token = generateToken(req.user._id, req.user.role);
@@ -12,5 +13,6 @@ export const googleAuthSuccess = (req, res) => {
     sameSite: "lax",
   });
 
-  res.redirect("http://localhost:5173/");
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  res.redirect(`${clientUrl}/`);
 };

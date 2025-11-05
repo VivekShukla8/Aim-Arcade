@@ -12,17 +12,18 @@ router.get(
 router.get(
   "/google/callback",
   (req, res, next) => {
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
     passport.authenticate(
       "google",
-      { failureRedirect: "http://localhost:5173/login", session: false },
+      { failureRedirect: `${clientUrl}/login`, session: false },
       (err, user, info) => {
         if (err) {
           console.error("Google OAuth error:", err, info);
-          return res.redirect("http://localhost:5173/login?error=oauth_token");
+          return res.redirect(`${clientUrl}/login?error=oauth_token`);
         }
         if (!user) {
           console.error("Google OAuth no user:", info);
-          return res.redirect("http://localhost:5173/login?error=oauth_no_user");
+          return res.redirect(`${clientUrl}/login?error=oauth_no_user`);
         }
         req.user = user;
         return googleAuthSuccess(req, res);
