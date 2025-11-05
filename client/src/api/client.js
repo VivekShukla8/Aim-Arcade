@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5008';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://aim-arcade.vercel.app';
 
 export const apiFetch = async (path, { method = 'GET', body, token } = {}) => {
   const headers = { 'Content-Type': 'application/json' };
